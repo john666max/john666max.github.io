@@ -2,6 +2,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     initScrollAnimations();
     initNavbarScroll();
+    initCarousel();
 });
 
 // Initialize scroll animations for elements
@@ -99,6 +100,26 @@ document.querySelectorAll('.btn, .contact-link').forEach(element => {
         setTimeout(() => ripple.remove(), 600);
     });
 });
+
+// Add carousel init to handle accessibility pause and ensure duplicate content if needed
+function initCarousel() {
+    const carousel = document.getElementById('logo-carousel');
+    if (!carousel) return;
+
+    // allow keyboard focus to pause the animation (CSS handles play-state)
+    carousel.addEventListener('focus', () => {
+        carousel.classList.add('paused');
+    });
+    carousel.addEventListener('blur', () => {
+        carousel.classList.remove('paused');
+    });
+
+    // Improve reduced-motion preference: stop animation if user prefers reduced motion
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const track = carousel.querySelector('.carousel-track');
+        if (track) track.style.animation = 'none';
+    }
+}
 
 // Log page load for debugging
 console.log('Portfolio website loaded successfully');
