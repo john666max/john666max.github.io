@@ -1,163 +1,213 @@
-// Smooth scroll behavior enhancements
 document.addEventListener('DOMContentLoaded', function() {
-    initScrollAnimations();
+    initScrollReveal();
     initNavbarScroll();
-    initCarousel();
+    initSmoothNavigation();
+    initHeroParallax();
+    initInteractiveCarousel();
+    initButtonEffects();
 });
 
-// Initialize scroll animations for elements
-function initScrollAnimations() {
+// ==========================================================================
+// 1. Front Page to Content Scroll Reveal Engine (Intersection Observer)
+// ==========================================================================
+function initScrollReveal() {
     const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
+        root: null, // Viewport standard binding
+        threshold: 0.12, // Triggers when 12% of the targeted view frame maps out
+        rootMargin: '0px 0px -40px 0px'
     };
 
-    const observer = new IntersectionObserver((entries) => {
+    const revealObserver = new IntersectionObserver((entries, observer) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.style.animation = 'fadeInUp 0.8s ease-out forwards';
-                observer.unobserve(entry.target);
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target); // Execution ends processing observation loop once visual assets load
             }
         });
     }, observerOptions);
 
-    // Observe all cards and text elements
-    document.querySelectorAll('.experience-card, .skill-category, .about-text p, .highlight-card').forEach(el => {
-        el.style.opacity = '0';
-        observer.observe(el);
+    // Track layout containers using the dedicated visibility system
+    document.querySelectorAll('.reveal-section').forEach(section => {
+        revealObserver.observe(section);
     });
 }
 
-// Navbar scroll effect
+// Navbar scroll edge layout behavior
 function initNavbarScroll() {
     const navbar = document.querySelector('.navbar');
-    let lastScrollTop = 0;
-
     window.addEventListener('scroll', () => {
-        const scrollTop = window.scrollY;
-
-        if (scrollTop > 100) {
-            navbar.style.borderBottomColor = 'rgba(66, 66, 69, 0.5)';
+        if (window.scrollY > 50) {
+            navbar.style.background = 'rgba(10, 10, 10, 0.85)';
+            navbar.style.borderBottomColor = 'rgba(66, 66, 69, 0.6)';
         } else {
-            navbar.style.borderBottomColor = '#424245';
+            navbar.style.background = 'rgba(10, 10, 10, 0.7)';
+            navbar.style.borderBottomColor = 'rgba(66, 66, 69, 0.3)';
         }
-
-        lastScrollTop = scrollTop;
     });
 }
 
-// Smooth scroll for navigation links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-        const href = this.getAttribute('href');
-        if (href !== '#') {
-            e.preventDefault();
-            const target = document.querySelector(href);
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
+// Handle Anchor Jump Interventions smoothly
+function initSmoothNavigation() {
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            if (href !== '#') {
+                e.preventDefault();
+                const target = document.querySelector(href);
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
             }
+        });
+    });
+}
+
+// Hero Parallax
+function initHeroParallax() {
+    const heroContent = document.querySelector('.hero-content');
+    window.addEventListener('scroll', () => {
+        if (!heroContent) return;
+        const scrollPosition = window.scrollY;
+        if (scrollPosition < window.innerHeight) {
+            heroContent.style.transform = `translateY(${scrollPosition * 0.35}px)`;
+            heroContent.style.opacity = 1 - (scrollPosition / (window.innerHeight * 0.8));
         }
     });
-});
+}
 
-// Add parallax effect to hero section
-window.addEventListener('scroll', () => {
-    const hero = document.querySelector('.hero');
-    const scrollPosition = window.scrollY;
-    hero.style.transform = `translateY(${scrollPosition * 0.5}px)`;
-});
-
-// Enhance button interactions
-document.querySelectorAll('.btn').forEach(button => {
-    button.addEventListener('mouseenter', function() {
-        this.style.transform = 'translateY(-3px)';
-    });
-    
-    button.addEventListener('mouseleave', function() {
-        this.style.transform = 'translateY(0)';
-    });
-});
-
-// Add ripple effect on click
-document.querySelectorAll('.btn, .contact-link').forEach(element => {
-    element.addEventListener('click', function(e) {
-        const ripple = document.createElement('span');
-        const rect = this.getBoundingClientRect();
-        const size = Math.max(rect.width, rect.height);
-        const x = e.clientX - rect.left - size / 2;
-        const y = e.clientY - rect.top - size / 2;
-
-        ripple.style.width = ripple.style.height = size + 'px';
-        ripple.style.left = x + 'px';
-        ripple.style.top = y + 'px';
-        ripple.classList.add('ripple');
-
-        this.appendChild(ripple);
-
-        setTimeout(() => ripple.remove(), 600);
-    });
-});
-
-// Smooth, seamless carousel + clickable logos
-function initCarousel() {
+// ==========================================================================
+// 2. High-Performance Infinite Loop Carousel (Drag + Button Mechanics)
+// ==========================================================================
+function initInteractiveCarousel() {
     const carousel = document.getElementById('logo-carousel');
     if (!carousel) return;
     const track = carousel.querySelector('.carousel-track');
+    const prevBtn = document.getElementById('carousel-prev');
+    const nextBtn = document.getElementById('carousel-next');
     if (!track) return;
 
-    // Ensure track doesn't wrap and can grow
-    track.style.whiteSpace = 'nowrap';
-    track.style.display = 'flex';
-    track.style.flexWrap = 'nowrap';
-    track.style.alignItems = 'center';
-    track.style.willChange = 'transform';
-    track.style.animationTimingFunction = 'linear';
-    track.style.animationIterationCount = 'infinite';
-
-    // Duplicate items until track is at least twice the visible width to avoid gaps
-    const originalItems = Array.from(track.children).filter(c => !c.dataset.clone);
-    const maxClones = 6; // safety cap to avoid runaway cloning
-    let loops = 0;
-    while (track.scrollWidth < carousel.clientWidth * 2 && loops < maxClones) {
-        for (const item of originalItems) {
-            const clone = item.cloneNode(true);
-            clone.dataset.clone = 'true';
-            track.appendChild(clone);
-        }
-        loops++;
-    }
-
-    // Determine a smooth animation duration based on one set width
-    const oneSetWidth = originalItems.reduce((sum, it) => sum + it.getBoundingClientRect().width, 0) + (parseFloat(getComputedStyle(track).gap || 28) * originalItems.length);
-    const speedPxPerSec = 140; // increase for faster scroll
-    const durationSec = Math.max(6, oneSetWidth / speedPxPerSec);
-    track.style.animationName = 'scroll-left';
-    track.style.animationDuration = `${durationSec}s`;
-
-    // Make items clickable: if there is an <a>, leave it; otherwise use data-url
-    track.querySelectorAll('.logo-item').forEach(item => {
-        const anchor = item.querySelector('a');
-        const url = anchor ? anchor.href : item.dataset.url;
-        if (url) {
-            // ensure pointer cursor
-            item.style.cursor = 'pointer';
-            // open link on click
-            item.addEventListener('click', (e) => {
-                // allow real anchors to behave normally
-                if (anchor) return;
-                window.open(url, '_blank', 'noopener');
-            });
-        }
+    let isAutoplayPaused = false;
+    let scrollPosition = 0;
+    const speed = 0.75; // Step frequency size for background processing animation tick loop
+    
+    // Build loop duplication matrix dynamically
+    const originalItems = Array.from(track.children);
+    originalItems.forEach(item => {
+        const clone = item.cloneNode(true);
+        track.appendChild(clone);
     });
 
-    // Respect reduced motion preference
+    // Compute layout dimensional limits
+    let itemWidth = originalItems[0].offsetWidth + 28; // Element dimensions mixed into standard margin gap values
+    let totalWidth = itemWidth * originalItems.length;
+
+    window.addEventListener('resize', () => {
+        itemWidth = originalItems[0].offsetWidth + 28;
+        totalWidth = itemWidth * originalItems.length;
+    });
+
+    // Core continuous render engine processing loop
+    function updateScroll() {
+        if (!isAutoplayPaused) {
+            scrollPosition -= speed;
+            if (Math.abs(scrollPosition) >= totalWidth) {
+                scrollPosition = 0; // Seamless reset without skipping standard layout view frames
+            }
+            track.style.transform = `translateX(${scrollPosition}px)`;
+        }
+        requestAnimationFrame(updateScroll);
+    }
+    
+    // Fire automatic engine
+    requestAnimationFrame(updateScroll);
+
+    // Directional control bindings
+    function handleManualShift(direction) {
+        isAutoplayPaused = true;
+        // Shift a complete item increment down the line track mapping sequence
+        scrollPosition += (direction * itemWidth * 1.5);
+        
+        // Prevent out-of-bounds anomalies during manual layout shifting execution cycles
+        if (scrollPosition > 0) {
+            scrollPosition = -totalWidth;
+        } else if (Math.abs(scrollPosition) >= totalWidth * 2) {
+            scrollPosition = -totalWidth;
+        }
+        
+        track.style.transform = `translateX(${scrollPosition}px)`;
+        // Restore automated gliding motion after manual interactive pause window expires
+        setTimeout(() => { isAutoplayPaused = false; }, 2500);
+    }
+
+    if (prevBtn && nextBtn) {
+        prevBtn.addEventListener('click', () => handleManualShift(1));
+        nextBtn.addEventListener('click', () => handleManualShift(-1));
+    }
+
+    // Set up item hyperlinks correctly
+    track.querySelectorAll('.logo-item').forEach(item => {
+        item.style.cursor = 'pointer';
+        item.addEventListener('click', () => {
+            const url = item.getAttribute('data-url');
+            if (url) window.open(url, '_blank', 'noopener noreferrer');
+        });
+        
+        // Pause automated movement when user hovers over an item
+        item.addEventListener('mouseenter', () => { isAutoplayPaused = true; });
+        item.addEventListener('mouseleave', () => { isAutoplayPaused = false; });
+    });
+
+    // Respect user device parameters for motion constraints
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        track.style.animation = 'none';
+        isAutoplayPaused = true;
     }
 }
 
-// Log page load for debugging
-console.log('Portfolio website loaded successfully');
+// Button micro-interactions and ripples
+function initButtonEffects() {
+    document.querySelectorAll('.btn').forEach(button => {
+        button.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-3px)';
+        });
+        button.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+
+    document.querySelectorAll('.btn, .contact-link').forEach(element => {
+        element.addEventListener('click', function(e) {
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            ripple.style.position = 'absolute';
+            ripple.style.background = 'rgba(255, 255, 255, 0.25)';
+            ripple.style.borderRadius = '50%';
+            ripple.style.transform = 'scale(0)';
+            ripple.style.pointerEvents = 'none';
+            ripple.style.animation = 'ripple-effect 0.6s linear';
+
+            this.style.position = 'relative';
+            this.style.overflow = 'hidden';
+            this.appendChild(ripple);
+
+            setTimeout(() => ripple.remove(), 600);
+        });
+    });
+}
+
+// Global ripple injection keyframe styles fallback mapping mechanism
+const styleSheet = document.createElement("style");
+styleSheet.innerText = `
+@keyframes ripple-effect {
+    to { transform: scale(4); opacity: 0; }
+}`;
+document.head.appendChild(styleSheet);

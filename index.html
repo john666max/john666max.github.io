@@ -10,7 +10,12 @@
     <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Navigation -->
+    <div class="aurora-container">
+        <div class="aurora-wave aurora-1"></div>
+        <div class="aurora-wave aurora-2"></div>
+        <div class="aurora-wave aurora-3"></div>
+    </div>
+
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-brand">John Chen</div>
@@ -24,7 +29,6 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
     <section id="hero" class="hero">
         <div class="hero-content">
             <h1 class="hero-title">John Chen</h1>
@@ -43,8 +47,7 @@
         </div>
     </section>
 
-    <!-- About Section -->
-    <section id="about" class="about">
+    <section id="about" class="about reveal-section">
         <div class="container">
             <h2 class="section-title">About Me</h2>
             <div class="about-content">
@@ -67,15 +70,14 @@
                     <div class="highlight-card">
                         <div class="highlight-number">OOP</div>
                         <div class="highlight-description">Object-Oriented Programming</div>
-                        <div class="highlight-label">Fluent in</div>
+                        <div class="highlight-label">Experienced in</div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Experience Section -->
-    <section id="experience" class="experience">
+    <section id="experience" class="experience reveal-section">
         <div class="container">
             <h2 class="section-title">Experience</h2>
             <div class="experience-grid">
@@ -126,18 +128,15 @@
         </div>
     </section>
 
-    <!-- View My Work (large image + description) -->
-    <section id="view-work" class="view-work">
+    <section id="view-work" class="view-work reveal-section">
         <div class="container">
             <h2 class="section-title">View My Work — FRC5409</h2>
             <div class="view-work-grid">
-                <!-- Use Hydra.jpg as requested -->
                 <div class="image-wrap">
                     <h3 class="image-title">Hydra-2026</h3>
-                        <img src="img/Hydra.jpg" alt="Hydra — FRC5409 2026 robot inspiration" loading="lazy">
+                    <img src="img/Hydra.jpg" alt="Hydra — FRC5409 2026 robot inspiration" loading="lazy">
                 </div>
                 <div class="view-description">
-                    <!-- Story content inserted -->
                     <h3>THE STORY BEHIND THE NAME</h3>
                     <p>
                         Camp X, also known as Special Training School (STS) #103, was established on December 6, 1941, along Lake Ontario between Whitby and Oshawa.
@@ -176,8 +175,7 @@
         </div>
     </section>
 
-    <!-- Skills Section -->
-    <section id="skills" class="skills">
+    <section id="skills" class="skills reveal-section">
         <div class="container">
             <h2 class="section-title">Skills & Tools</h2>
             <div class="skills-grid">
@@ -186,7 +184,6 @@
                     <div class="skill-tags">
                         <span class="skill-tag">Java</span>
                         <span class="skill-tag">Python</span>
-                        </div>
                     </div>
                 </div>
 
@@ -223,32 +220,34 @@
         </div>
     </section>
 
-    <!-- Skills Logos Carousel (replace image srcs with your hosted logos) -->
     <section id="skills-logos" class="skills-logos">
-        <div class="container">
+        <div class="container" style="position: relative;">
             <h3 class="section-subtitle">Tools & Frameworks — quick look</h3>
-            <div class="carousel" id="logo-carousel" tabindex="0" aria-roledescription="carousel" aria-label="Skills and tools carousel">
-                <div class="carousel-track" role="list">
-                    <!-- Replace data-url with the correct target; images kept as-is -->
-                    <div class="logo-item" role="listitem" data-url="https://www.oracle.com/java/"><img class="logo-img" src="img/Java.png" alt="Logo 1"></div>
-                    <div class="logo-item" role="listitem" data-url="https://www.python.org/"><img class="logo-img" src="img/Python.png" alt="Logo 2"></div>
-                    <div class="logo-item" role="listitem" data-url="https://docs.wpilib.org/"><img class="logo-img" src="img/wpilib.webp" alt="WPILib"></div>
-                    <div class="logo-item" role="listitem" data-url="https://github.com/mjansen485/PathPlanner"><img class="logo-img" src="img/Pathplanner.png" alt="Path Planner"></div>
-                    <div class="logo-item" role="listitem" data-url="https://github.com/AdvantageKit/AdvantageKit"><img class="logo-img" src="img/Advantagescope.png" alt="Advantage Kit"></div>
-                    <div class="logo-item" role="listitem" data-url="https://git-scm.com/"><img class="logo-img" src="img/Github.png" alt="Git"></div>
-                    <div class="logo-item" role="listitem" data-url="https://www.jetbrains.com/idea/"><img class="logo-img" src="img/Intellij.png" alt="IntelliJ IDEA"></div>
-                    <div class="logo-item" role="listitem" data-url="https://code.visualstudio.com/"><img class="logo-img" src="img/VS code.png" alt="Visual Studio Code"></div>
-                    <div class="logo-item" role="listitem" data-url="https://www.firstinspires.org/"><img class="logo-img" src="img/FRC.png" alt="FIRST Robotics Competition"></div>
-                    <div class="logo-item" role="listitem" data-url="https://www.apple.com/ca"><img class="logo-img" src="img/Apple.png" alt="Specialized High Skills Major"></div>
-
-                    <!-- Keep these duplicates if you prefer static duplication; JS will clone as needed too -->
+            
+            <div class="carousel-navigation-wrapper">
+                <button class="carousel-control-btn prev-btn" id="carousel-prev" aria-label="Previous Slide">&#10094;</button>
+                
+                <div class="carousel" id="logo-carousel" tabindex="0" aria-roledescription="carousel" aria-label="Skills and tools carousel">
+                    <div class="carousel-track" role="list">
+                        <div class="logo-item" role="listitem" data-url="https://www.oracle.com/java/"><img class="logo-img" src="img/Java.png" alt="Java"></div>
+                        <div class="logo-item" role="listitem" data-url="https://www.python.org/"><img class="logo-img" src="img/Python.png" alt="Python"></div>
+                        <div class="logo-item" role="listitem" data-url="https://docs.wpilib.org/"><img class="logo-img" src="img/wpilib.webp" alt="WPILib"></div>
+                        <div class="logo-item" role="listitem" data-url="https://github.com/mjansen485/PathPlanner"><img class="logo-img" src="img/Pathplanner.png" alt="Path Planner"></div>
+                        <div class="logo-item" role="listitem" data-url="https://github.com/AdvantageKit/AdvantageKit"><img class="logo-img" src="img/Advantagescope.png" alt="Advantage Kit"></div>
+                        <div class="logo-item" role="listitem" data-url="https://git-scm.com/"><img class="logo-img" src="img/Github.png" alt="Git"></div>
+                        <div class="logo-item" role="listitem" data-url="https://www.jetbrains.com/idea/"><img class="logo-img" src="img/Intellij.png" alt="IntelliJ IDEA"></div>
+                        <div class="logo-item" role="listitem" data-url="https://code.visualstudio.com/"><img class="logo-img" src="img/VS code.png" alt="Visual Studio Code"></div>
+                        <div class="logo-item" role="listitem" data-url="https://www.firstinspires.org/"><img class="logo-img" src="img/FRC.png" alt="FIRST Robotics Competition"></div>
+                        <div class="logo-item" role="listitem" data-url="https://www.apple.com/ca"><img class="logo-img" src="img/Apple.png" alt="Specialized High Skills Major"></div>
+                    </div>
                 </div>
+                
+                <button class="carousel-control-btn next-btn" id="carousel-next" aria-label="Next Slide">&#10095;</button>
             </div>
         </div>
     </section>
 
-    <!-- Contact Section -->
-    <section id="contact" class="contact">
+    <section id="contact" class="contact reveal-section">
         <div class="container">
             <h2 class="section-title">Let's Connect</h2>
             <p class="contact-description">
@@ -278,7 +277,6 @@
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="footer">
         <p>&copy; 2026 John Chen. All rights reserved.</p>
     </footer>
