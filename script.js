@@ -106,19 +106,25 @@ function initCarousel() {
     const carousel = document.getElementById('logo-carousel');
     if (!carousel) return;
 
-    // allow keyboard focus to pause the animation (CSS handles play-state)
-    carousel.addEventListener('focus', () => {
-        carousel.classList.add('paused');
-    });
-    carousel.addEventListener('blur', () => {
-        carousel.classList.remove('paused');
-    });
+    // Pause animation on keyboard focus (CSS handles play-state)
+    carousel.addEventListener('focus', () => carousel.classList.add('carousel-focused'));
+    carousel.addEventListener('blur', () => carousel.classList.remove('carousel-focused'));
 
-    // Improve reduced-motion preference: stop animation if user prefers reduced motion
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    // If user prefers reduced motion, stop the animation (CSS also handles this)
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         const track = carousel.querySelector('.carousel-track');
         if (track) track.style.animation = 'none';
     }
+
+    // Optional: make carousel pause on pointerdown (user interacting)
+    carousel.addEventListener('pointerdown', () => {
+        const track = carousel.querySelector('.carousel-track');
+        if (track) track.style.animationPlayState = 'paused';
+    });
+    carousel.addEventListener('pointerup', () => {
+        const track = carousel.querySelector('.carousel-track');
+        if (track) track.style.animationPlayState = '';
+    });
 }
 
 // Log page load for debugging
