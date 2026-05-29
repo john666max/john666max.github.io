@@ -101,30 +101,62 @@ document.querySelectorAll('.btn, .contact-link').forEach(element => {
     });
 });
 
-// Add carousel init to handle accessibility pause and ensure duplicate content if needed
+// Smooth, seamless carousel + clickable logos
 function initCarousel() {
     const carousel = document.getElementById('logo-carousel');
     if (!carousel) return;
+    const track = carousel.querySelector('.carousel-track');
+    if (!track) return;
 
-    // Pause animation on keyboard focus (CSS handles play-state)
-    carousel.addEventListener('focus', () => carousel.classList.add('carousel-focused'));
-    carousel.addEventListener('blur', () => carousel.classList.remove('carousel-focused'));
+    // Ensure track doesn't wrap and can grow
+    track.style.whiteSpace = 'nowrap';
+    track.style.display = 'flex';
+    track.style.flexWrap = 'nowrap';
+    track.style.alignItems = 'center';
+    track.style.willChange = 'transform';
+    track.style.animationTimingFunction = 'linear';
+    track.style.animationIterationCount = 'infinite';
 
-    // If user prefers reduced motion, stop the animation (CSS also handles this)
-    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        const track = carousel.querySelector('.carousel-track');
-        if (track) track.style.animation = 'none';
+    // Duplicate items until track is at least twice the visible width to avoid gaps
+    const originalItems = Array.from(track.children).filter(c => !c.dataset.clone);
+    const maxClones = 6; // safety cap to avoid runaway cloning
+    let loops = 0;
+    while (track.scrollWidth < carousel.clientWidth * 2 && loops < maxClones) {
+        for (const item of originalItems) {
+            const clone = item.cloneNode(true);
+            clone.dataset.clone = 'true';
+            track.appendChild(clone);
+        }
+        loops++;
     }
 
-    // Optional: make carousel pause on pointerdown (user interacting)
-    carousel.addEventListener('pointerdown', () => {
-        const track = carousel.querySelector('.carousel-track');
-        if (track) track.style.animationPlayState = 'paused';
+    // Determine a smooth animation duration based on one set width
+    const oneSetWidth = originalItems.reduce((sum, it) => sum + it.getBoundingClientRect().width, 0) + (parseFloat(getComputedStyle(track).gap || 28) * originalItems.length);
+    const speedPxPerSec = 140; // increase for faster scroll
+    const durationSec = Math.max(6, oneSetWidth / speedPxPerSec);
+    track.style.animationName = 'scroll-left';
+    track.style.animationDuration = `${durationSec}s`;
+
+    // Make items clickable: if there is an <a>, leave it; otherwise use data-url
+    track.querySelectorAll('.logo-item').forEach(item => {
+        const anchor = item.querySelector('a');
+        const url = anchor ? anchor.href : item.dataset.url;
+        if (url) {
+            // ensure pointer cursor
+            item.style.cursor = 'pointer';
+            // open link on click
+            item.addEventListener('click', (e) => {
+                // allow real anchors to behave normally
+                if (anchor) return;
+                window.open(url, '_blank', 'noopener');
+            });
+        }
     });
-    carousel.addEventListener('pointerup', () => {
-        const track = carousel.querySelector('.carousel-track');
-        if (track) track.style.animationPlayState = '';
-    });
+
+    // Respect reduced motion preference
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        track.style.animation = 'none';
+    }
 }
 
 // Log page load for debugging

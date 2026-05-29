@@ -655,7 +655,7 @@ section {
     align-items: center;
     will-change: transform;
     padding: 8px 0;
-    animation: scroll-left 24s linear infinite;
+    animation: scroll-left 12s linear infinite; /* faster scroll */
 }
 .logo-item {
     flex: 0 0 auto;
@@ -682,12 +682,6 @@ section {
     100% { transform: translateX(-50%); }
 }
 
-/* pause on hover or focus for accessibility */
-#logo-carousel:hover .carousel-track,
-#logo-carousel:focus .carousel-track {
-    animation-play-state: paused;
-}
-
 /* respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
     .carousel-track {
@@ -698,5 +692,5 @@ section {
 /* responsive */
 @media (max-width: 768px) {
     .logo-item { width: 92px; height: 64px; }
-    .carousel-track { gap: 18px; animation-duration: 28s; }
+    .carousel-track { gap: 18px; animation-duration: 14s; } /* faster on small screens */
 }
